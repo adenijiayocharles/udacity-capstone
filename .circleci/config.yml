@@ -5,8 +5,6 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
-      - restore_cache:
-          keys: [backend-build]
       - run:
           name: "Build the backend"
           command: |
@@ -15,8 +13,23 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
+  lint-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: "Build the backend"
+          command: |
+            cd backend
+            npm install
+            npm run lint
 
 workflows:
   default:
     jobs:
       - build-backend
+      - lint-backend
+        requires: [build-backend]
