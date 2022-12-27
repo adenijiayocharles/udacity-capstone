@@ -6,7 +6,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "Lint the backend"
+          name: "Build the backend"
           command: |
             cd backend
             npm install
@@ -21,7 +21,7 @@ jobs:
       - restore_cache:
           keys: [backend-build]
       - run:
-          name: "Build the backend"
+          name: "Lint the backend"
           command: |
             cd backend
             npm install
