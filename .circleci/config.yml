@@ -12,14 +12,14 @@ jobs:
             npm install
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-build-${CIRCLE_WORKFLOW_ID}
+          key: "backend-build-${CIRCLE_WORKFLOW_ID}"
   lint-backend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-build-${CIRCLE_WORKFLOW_ID}]
+          keys: ["backend-build-${CIRCLE_WORKFLOW_ID}"]
       - run:
           name: "Lint the backend"
           command: |
