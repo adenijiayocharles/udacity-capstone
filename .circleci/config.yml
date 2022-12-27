@@ -31,5 +31,5 @@ workflows:
   default:
     jobs:
       - build-backend
-      - lint-backend
+      - lint-backend:
         requires: [build-backend]
