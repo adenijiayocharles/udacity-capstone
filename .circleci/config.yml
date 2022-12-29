@@ -12,21 +12,43 @@ jobs:
             npm install
       - save_cache:
           paths: [backend/node_modules]
-          key: "backend-build-${CIRCLE_WORKFLOW_ID}"
+          key: "backend-build"
   lint-backend:
     docker:
       - image: circleci/node:13.8.0
     steps:
       - checkout
       - restore_cache:
-          keys: ["backend-build-${CIRCLE_WORKFLOW_ID}"]
+          keys: ["backend-build"]
       - run:
           name: "Lint the backend"
           command: |
             cd backend
             npm install
             npm run lint
-
+    deploy-infrastructure:
+      docker:
+        - image: amazon/aws-cli
+      steps:
+        - checkout
+        - run:
+            name: Install tar utility
+            command: |
+              yum install -y tar gzip
+        - run:
+            name: "Ensure that backend infrasturcture exists"
+            command: |
+              aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID}" \
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}" \
+              --tags project=udapeople-backend \
+        - restore_cache:
+            keys: [backend-build]
+        - persist_to_workspace:
+            root: ~/
+            paths:
+              - project/.circleci/ansible/inventory.txt
 workflows:
   default:
     jobs:
