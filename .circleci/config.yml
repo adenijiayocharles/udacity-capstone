@@ -56,6 +56,14 @@ jobs:
             --stack-name "udanode-backend-${CIRCLE_WORKFLOW_ID}" \
             --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}" \
             --tags project=udanode-backend \
+      - run:
+          name: "Add EC2 Instance IP to the ansible inventory"
+          command: |
+            aws ec2 describe-instances \
+            --query 'Reservations[*].Instances[*].PublicIpAddress' \
+            --filter "Name=tag-value,Values=backend-${CIRCLE_WORKFLOW_ID}" \
+            --output text >> .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
       - restore_cache:
           keys: [backend-build]
       - persist_to_workspace:
