@@ -1,4 +1,17 @@
 version: 2.1
+commands:
+  destroy-environment:
+    description: Destroy back-end cloudformation stacks given a workflow ID.
+    parameters:
+      workflow_id:
+        type: string
+    steps:
+      - run:
+          name: Destroy environments
+          when: on_fail
+          command: |
+            aws cloudformation delete-stack \
+              --stack-name "udapeople-backend-<<parameters.workflow_id>>"
 jobs:
   build-backend:
     docker:
@@ -49,6 +62,8 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID}"
 workflows:
   default:
     jobs:
