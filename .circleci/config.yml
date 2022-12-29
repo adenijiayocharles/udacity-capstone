@@ -39,10 +39,10 @@ jobs:
           name: "Ensure that backend infrasturcture exists"
           command: |
             aws cloudformation deploy \
-            --template-file .circleci/files/backend.yml \
-            --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID}" \
+            --template-file files/backend.yml \
+            --stack-name "udanode-backend-${CIRCLE_WORKFLOW_ID}" \
             --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}" \
-            --tags project=udapeople-backend \
+            --tags project=udanode-backend \
       - restore_cache:
           keys: [backend-build]
       - persist_to_workspace:
@@ -56,4 +56,4 @@ workflows:
       - lint-backend:
           requires: [build-backend]
       - deploy-infrastructure:
-          requires: [build-backend]
+          requires: [lint-backend]
