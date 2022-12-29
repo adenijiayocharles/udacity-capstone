@@ -39,7 +39,7 @@ jobs:
           name: "Ensure that backend infrasturcture exists"
           command: |
             aws cloudformation deploy \
-            --template-file files/infra.yml \
+            --template-file .circleci/files/infra.yml \
             --stack-name "udanode-backend-${CIRCLE_WORKFLOW_ID}" \
             --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}" \
             --tags project=udanode-backend \
