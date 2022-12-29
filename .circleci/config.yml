@@ -26,32 +26,34 @@ jobs:
             cd backend
             npm install
             npm run lint
-    deploy-infrastructure:
-      docker:
-        - image: amazon/aws-cli
-      steps:
-        - checkout
-        - run:
-            name: Install tar utility
-            command: |
-              yum install -y tar gzip
-        - run:
-            name: "Ensure that backend infrasturcture exists"
-            command: |
-              aws cloudformation deploy \
-              --template-file .circleci/files/backend.yml \
-              --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID}" \
-              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}" \
-              --tags project=udapeople-backend \
-        - restore_cache:
-            keys: [backend-build]
-        - persist_to_workspace:
-            root: ~/
-            paths:
-              - project/.circleci/ansible/inventory.txt
+  deploy-infrastructure:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install tar utility
+          command: |
+            yum install -y tar gzip
+      - run:
+          name: "Ensure that backend infrasturcture exists"
+          command: |
+            aws cloudformation deploy \
+            --template-file .circleci/files/backend.yml \
+            --stack-name "udapeople-backend-${CIRCLE_WORKFLOW_ID}" \
+            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}" \
+            --tags project=udapeople-backend \
+      - restore_cache:
+          keys: [backend-build]
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
 workflows:
   default:
     jobs:
       - build-backend
       - lint-backend:
+          requires: [build-backend]
+      - deploy-infrastructure:
           requires: [build-backend]
