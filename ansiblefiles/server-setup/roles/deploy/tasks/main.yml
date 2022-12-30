@@ -1,0 +1,19 @@
+---
+- name: "Creates backend app directory"
+  file:
+    path: /home/ubuntu/backend
+    state: directory
+
+- name: "Unzip backend files"
+  unarchive:
+    src: /home/circleci/project/artifact.tar.gz
+    dest: /home/ubuntu/backend
+
+- name: "Start server"
+  become: true
+  shell: |
+    cd /home/ubuntu/backend
+    npm install
+    npm run build
+    pm2 stop default
+    pm2 start npm -- start
