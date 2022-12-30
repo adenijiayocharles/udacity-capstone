@@ -90,7 +90,7 @@ jobs:
           name: "Configure server"
           no_output_timeout: 30m
           command: |
-            cd ansible/server-setup
+            cd ansible
             cat inventory.txt
             export ANSIBLE_HOST_KEY_CHECKING=False
             ansible-playbook -i inventory.txt configure-server.yml
