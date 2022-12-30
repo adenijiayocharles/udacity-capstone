@@ -72,6 +72,89 @@ jobs:
             - project/.circleci/ansible/inventory.txt
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["9f:eb:a3:74:60:33:b5:7c:8e:b5:c4:90:c8:85:17:bb"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: "Install dependencies"
+          command: |
+            apk add openssh-client
+            apk add --update ansible
+      - run:
+          name: "Configure server"
+          no_output_timeout: 30m
+          command: |
+            cd .circleci/ansible
+            cat inventory.txt
+            export ANSIBLE_HOST_KEY_CHECKING=False
+            ansible-playbook -i inventory.txt configure-server.yml
+      - run:
+          name: Install AWS CLI for rollback
+          when: on_fail
+          command: |
+            apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID}"
+  deploy-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["9f:eb:a3:74:60:33:b5:7c:8e:b5:c4:90:c8:85:17:bb"]
+      - attach_workspace:
+          at: ~/
+      - restore_cache:
+          keys: [backend-build]
+      - run:
+          name: Install tar utility
+          command: |
+            sudo apt -y update
+            sudo apt -y upgrade
+            sudo apt -y install software-properties-common
+            sudo apt-get -y install tar
+      - run:
+          name: Install gzip unzip utility
+          command: |
+            sudo apt-get -y install gzip
+            sudo apt-get -y install unzip
+      - run:
+          name: Install python
+          command: |
+            sudo apt-get -y install python3
+      - run:
+          name: "Install ansible"
+          command: |
+            sudo add-apt-repository --y ppa:ansible/ansible
+            sudo apt-get -y install ansible
+      - run:
+          name: Install awscli
+          command: |
+            echo "insecure" >> ~/.curlrc
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+      - run:
+          name: "Deploy backend"
+          command: |
+            cd backend
+            npm i
+            npm run build
+            cd ..
+            tar -C backend -czvf artifact.tar.gz .
+            cd .circleci/ansible
+            echo "Contents of the inventory.txt file is -------"
+            cat inventory.txt
+            export ANSIBLE_HOST_KEY_CHECKING=False
+            ansible-playbook -i inventory.txt deploy-backend.yml
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID}"
 workflows:
   default:
     jobs:
@@ -80,3 +163,7 @@ workflows:
           requires: [build-backend]
       - deploy-infrastructure:
           requires: [lint-backend]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+      - deploy-backend:
+          requires: [configure-infrastructure]
