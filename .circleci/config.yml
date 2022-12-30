@@ -93,7 +93,7 @@ jobs:
             cd ansible
             cat inventory.txt
             export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook -i inventory.txt configure-server.yml
+            ansible-playbook -i inventory.txt server-setup/configure-server.yml
       - run:
           name: Install AWS CLI for rollback
           when: on_fail
@@ -151,7 +151,7 @@ jobs:
             echo "Contents of the inventory.txt file is -------"
             cat inventory.txt
             export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook -i inventory.txt deploy-backend.yml
+            ansible-playbook -i inventory.txt server-setup/deploy-backend.yml
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"
 workflows:
