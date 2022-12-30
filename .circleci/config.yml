@@ -145,7 +145,6 @@ jobs:
           command: |
             cd backend
             npm i
-            npm run build
             cd ..
             tar -C backend -czvf artifact.tar.gz .
             cd .circleci/ansible
