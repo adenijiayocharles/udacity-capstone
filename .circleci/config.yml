@@ -191,13 +191,22 @@ jobs:
           command: |
             cd backend/kubernetes
             bash install_minikube.sh
-            minikube
+            minikube start
       - run:
           name: Install Kubectl
           command: |
             cd backend/kubernetes
             bash install_kubectl.sh
             kubectl version -o json  --client
+      - run:
+          name: Start Project
+          commands: |
+            dockerpath=adenijiayocharles/udanode:${CIRCLE_SHA1}
+            kubectl run adenijiayocharles/udanode:${CIRCLE_SHA1} \
+                --image=adenijiayocharles/udanode:${CIRCLE_SHA1} \
+                --port=80 --labels app=adenijiayocharles/udanode:${CIRCLE_SHA1}
+            kubectl get pods
+            kubectl port-forward adenijiayocharles/udanode:${CIRCLE_SHA1} 8000:80
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"
 workflows:
