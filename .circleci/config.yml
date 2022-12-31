@@ -90,6 +90,10 @@ jobs:
           name: "Configure server"
           no_output_timeout: 30m
           command: |
+            cd backend
+            npm i
+            cd ..
+            tar -C backend -czvf artifact.tar.gz .
             cd ansible
             cat inventory.txt
             export ANSIBLE_HOST_KEY_CHECKING=False
