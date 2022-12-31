@@ -10,18 +10,17 @@
     dest: /home/ubuntu/backend
 
 - name: Install docker packages
-    remote_user: ubuntu
-    apt:
-      name: "{{ item }}"
-      state: present
-      update_cache: yes
-    with_items:
-      - apt-transport-https
-      - ca-certificates
-      - curl
-      - software-properties-common
-    tags:
-      - docker
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
+  tags:
+    - docker
 - name: Add Docker s official GPG key
   remote_user: ubuntu
   apt_key:
@@ -30,14 +29,12 @@
   tags:
     - docker
 - name: Verify that we have the key with the fingerprint
-  remote_user: ubuntu
   apt_key:
     id: 0EBFCD88
     state: present
   tags:
     - docker
 - name: Set up the stable repository
-  remote_user: ubuntu
   apt_repository:
     repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
     state: present
@@ -45,13 +42,11 @@
   tags:
     - docker
 - name: Update apt packages
-  remote_user: ubuntu
   apt:
     update_cache: yes
   tags:
     - docker
 - name: Install docker
-  remote_user: ubuntu
   apt:
     name: docker-ce
     state: present
@@ -60,7 +55,6 @@
   tags:
     - docker
 - name: Add remote "ubuntu" user to "docker" group
-  remote_user: ubuntu
   user:
     name: "ubuntu"
     group: "docker"
@@ -68,7 +62,6 @@
   tags:
     - docker
 - name: Install docker-compose
-  remote_user: ubuntu
   get_url: 
     url : https://github.com/docker/compose/releases/download/1.25.1-rc1/docker-compose-Linux-x86_64
     dest: /usr/local/bin/docker-compose
