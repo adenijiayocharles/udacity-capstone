@@ -189,16 +189,15 @@ jobs:
       - run:
           name: Install Minikube
           command: |
-            sudo groupadd docker
             sudo usermod -aG docker $USER
-            exec su -l $USER
-            sudo dockerd
-            cd backend/kubernetes
-            bash install_minikube.sh
-            # sudo systemctl start docker
-            # sudo systemctl enable docker
-            docker ps
-            minikube start --driver=docker
+            su - ${USER}
+            # sudo dockerd
+            # cd backend/kubernetes
+            # bash install_minikube.sh
+            # # sudo systemctl start docker
+            # # sudo systemctl enable docker
+            # docker ps
+            # minikube start --driver=docker
       - run:
           name: Install Kubectl
           command: |
