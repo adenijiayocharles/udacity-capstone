@@ -189,6 +189,7 @@ jobs:
       - run:
           name: Install Minikube
           command: |
+            sudo groupadd docker
             sudo usermod -aG docker $USER
             exec su -l $USER
             sudo dockerd
