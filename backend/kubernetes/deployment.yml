@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: node-app
-          image: adenijiayocharles/udanode:${CIRCLE_SHA1}
+          image: adenijiayocharles/udanodeapp:${CIRCLE_SHA1}
           ports:
             - containerPort: 8080
 ---
