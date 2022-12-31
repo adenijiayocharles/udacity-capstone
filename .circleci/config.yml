@@ -161,58 +161,19 @@ jobs:
             ansible-playbook -i inventory.txt server-setup/deploy-backend.yml
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"
-  install-docker:
+  build-and-push-docker-image:
     docker:
-      - image: circleci/node:13.8.0
+      - image: docker:17.05.0-ce-git
     steps:
       - checkout
-      - add_ssh_keys:
-          fingerprints: ["76:e2:6e:ec:f6:e1:8a:d8:8e:da:da:38:1e:0d:5a:26"]
-      - attach_workspace:
-          at: ~/
-      - restore_cache:
-          keys: [backend-build]
+      - setup_remote_docker
       - run:
-          name: Install tar utility
-          command: |
-            sudo apt -y update
-            sudo apt -y upgrade
-            sudo apt -y install software-properties-common
-            sudo apt-get -y install tar
-      - run:
-          name: Install gzip unzip utility
-          command: |
-            sudo apt-get -y install gzip
-            sudo apt-get -y install unzip
-      - run:
-          name: Install python
-          command: |
-            sudo apt-get -y install python3
-      - run:
-          name: Install awscli
-          command: |
-            echo "insecure" >> ~/.curlrc
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
-      - run:
-          name: "Install ansible"
-          command: |
-            sudo add-apt-repository --y ppa:ansible/ansible
-            sudo apt-get -y install ansible
-      - run:
-          name: "Deploy Docker"
+          name: Build application Docker image
           command: |
             cd backend
-            cd ..
-            tar -C backend -czvf artifact.tar.gz .
-            cd ansible
-            echo "Contents of the inventory.txt file is -------"
-            cat inventory.txt
-            export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook -i inventory.txt server-setup/install-docker.yml
-      - destroy-environment:
-          workflow_id: "${CIRCLE_WORKFLOW_ID}"
+            docker build -t adenijiayocharles/udanode:${CIRCLE_SHA1} .
+            docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
+            docker push adenijiayocharles/udanode:${CIRCLE_SHA1}
 workflows:
   default:
     jobs:
@@ -225,5 +186,5 @@ workflows:
           requires: [deploy-infrastructure]
       - deploy-backend:
           requires: [configure-infrastructure]
-      # - install-docker:
-      #     requires: [configure-infrastructure]
+      - build-and-push-docker-image:
+          requires: [deploy-backend]
