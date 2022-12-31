@@ -183,7 +183,7 @@ jobs:
           name: Install Minikube
           command: |
             cd backend/kubernetes
-            bash install_minikube.sh
+            bash ./install_minikube.sh
             minikube
 
 workflows:
