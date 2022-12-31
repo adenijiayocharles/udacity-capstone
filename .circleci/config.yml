@@ -91,7 +91,6 @@ jobs:
           no_output_timeout: 30m
           command: |
             cd backend
-            npm i
             cd ..
             tar -C backend -czvf artifact.tar.gz .
             cd ansible
