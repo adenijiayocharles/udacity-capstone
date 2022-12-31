@@ -129,6 +129,13 @@ jobs:
           command: |
             sudo apt-get -y install python3
       - run:
+          name: Install awscli
+          command: |
+            echo "insecure" >> ~/.curlrc
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+      - run:
           name: "Install ansible"
           command: |
             sudo add-apt-repository --y ppa:ansible/ansible

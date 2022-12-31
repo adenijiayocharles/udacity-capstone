@@ -14,22 +14,12 @@
   apt:
     autoremove: yes
 
-- name: "Add Node.js from Nodesource"
-  become: true
-  shell: |
-    curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+- name: "Creates backend app directory"
+  file:
+    path: /home/ubuntu/backend
+    state: directory
 
-- name: "Install Node.js 13"
-  become: true
-  apt:
-    name: ["nodejs"]
-    state: latest
-    update_cache: yes
-
-- name: "install pm2"
-  become: true
-  npm:
-    name: pm2
-    global: yes
-    production: yes
-    state: present
+- name: "Unzip backend files"
+  unarchive:
+    src: /home/circleci/project/artifact.tar.gz
+    dest: /home/ubuntu/backend
