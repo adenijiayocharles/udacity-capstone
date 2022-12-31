@@ -191,6 +191,7 @@ jobs:
           command: |
             cd backend/kubernetes
             bash install_minikube.sh
+            docker ps
             sudo systemctl start docker
             docker system prune
             minikube delete
