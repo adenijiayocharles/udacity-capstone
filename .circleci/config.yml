@@ -190,7 +190,7 @@ jobs:
           name: Install Minikube
           command: |
             cd backend/kubernetes
-            ./install_minikube.sh
+            bash install_minikube.sh
             minikube
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"
