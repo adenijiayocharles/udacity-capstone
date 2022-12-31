@@ -152,6 +152,17 @@ jobs:
             cat inventory.txt
             export ANSIBLE_HOST_KEY_CHECKING=False
             ansible-playbook -i inventory.txt server-setup/deploy-backend.yml
+      - run:
+          name: "Deploy Docker"
+          command: |
+            cd backend
+            cd ..
+            tar -C backend -czvf artifact.tar.gz .
+            cd ansible
+            echo "Contents of the inventory.txt file is -------"
+            cat inventory.txt
+            export ANSIBLE_HOST_KEY_CHECKING=False
+            ansible-playbook -i inventory.txt server-setup/install-docker.yml
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"
 workflows:
