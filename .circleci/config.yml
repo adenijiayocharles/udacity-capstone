@@ -196,8 +196,7 @@ jobs:
             sudo mv minikube-linux-amd64 /usr/local/bin/minikube
             # sleep 5
             minikube delete
-            minikube start
-            # minikube start --driver=docker
+            minikube start --driver=docker
 workflows:
   default:
     jobs:
