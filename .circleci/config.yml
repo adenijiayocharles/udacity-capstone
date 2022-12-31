@@ -189,10 +189,11 @@ jobs:
       - run:
           name: Install Minikube
           command: |
+            sudo dockerd
             cd backend/kubernetes
             bash install_minikube.sh
-            sudo systemctl start docker
-            sudo systemctl enable docker
+            # sudo systemctl start docker
+            # sudo systemctl enable docker
             docker ps
             minikube start --driver=docker
       - run:
