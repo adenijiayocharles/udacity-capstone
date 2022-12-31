@@ -174,7 +174,7 @@ jobs:
             docker build -t adenijiayocharles/udanode:${CIRCLE_SHA1} .
             docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
             docker push adenijiayocharles/udanode:${CIRCLE_SHA1}
-  install-minikube:
+  install-minikube-kubectl:
     docker:
       - image: circleci/ruby:2.4.1
     steps:
@@ -192,6 +192,12 @@ jobs:
             cd backend/kubernetes
             bash install_minikube.sh
             minikube
+      - run:
+          name: Install Kubectl
+          command: |
+            cd backend/kubernetes
+            bash install_kubectl.sh
+            kubectl version -o json  --client
       - destroy-environment:
           workflow_id: "${CIRCLE_WORKFLOW_ID}"
 workflows:
@@ -208,5 +214,5 @@ workflows:
           requires: [configure-infrastructure]
       - build-and-push-docker-image:
           requires: [deploy-backend]
-      - install-minikube:
+      - install-minikube-kubectl:
           requires: [build-and-push-docker-image]
