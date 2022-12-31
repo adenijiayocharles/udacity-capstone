@@ -191,7 +191,9 @@ jobs:
           command: |
             cd backend/kubernetes
             bash install_minikube.sh
-            minikube start
+            docker system prune
+            minikube delete
+            minikube start --driver=docker
       - run:
           name: Install Kubectl
           command: |
