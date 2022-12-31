@@ -171,9 +171,59 @@ jobs:
           name: Build application Docker image
           command: |
             cd backend
-            docker build -t adenijiayocharles/udanodeapp:${CIRCLE_SHA1} .
-            docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
-            docker push adenijiayocharles/udanodeapp:${CIRCLE_SHA1}
+            # docker build -t adenijiayocharles/udanodeapp:${CIRCLE_SHA1} .
+            # docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
+            # docker push adenijiayocharles/udanodeapp:${CIRCLE_SHA1}
+  install-minikube-kubectl:
+    docker:
+      - image: circleci/ruby:2.4.1
+    steps:
+      - checkout
+      - run:
+          name: Install awscli
+          command: |
+            echo "insecure" >> ~/.curlrc
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+      - run:
+          name: Install Minikube
+          command: |
+            sudo apt update
+            sudo apt install apt-transport-https ca-certificates curl software-properties-common
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
+            sudo apt update
+            apt-cache policy docker-ce
+            sudo apt install docker-ce
+            sudo systemctl status docker
+            sudo usermod -aG docker ${USER}
+            su - ${USER}
+      #       docker ps
+      #       # sudo usermod -aG docker $USER
+      #       # su - ${USER}
+      #       # sudo dockerd
+      #       # cd backend/kubernetes
+      #       # bash install_minikube.sh
+      #       # # sudo systemctl start docker
+      #       # # sudo systemctl enable docker
+      #       # docker ps
+      #       # minikube start --driver=docker
+      # - run:
+      #     name: Install Kubectl
+      #     command: |
+      #       cd backend/kubernetes
+      #       bash install_kubectl.sh
+      #       kubectl version -o json  --client
+      # - run:
+      #     name: Deploy K8s
+      #     command: |
+      #       cd backend/kubernetes
+      #       kubectl apply -f deployment.yaml
+      #       kubectl get pods
+
+      - destroy-environment:
+          workflow_id: "${CIRCLE_WORKFLOW_ID}"
 workflows:
   default:
     jobs:
@@ -188,3 +238,5 @@ workflows:
           requires: [configure-infrastructure]
       - build-and-push-docker-image:
           requires: [deploy-backend]
+      - install-minikube-kubectl:
+          requires: [build-and-push-docker-image]
