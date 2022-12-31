@@ -81,11 +81,18 @@ jobs:
           fingerprints: ["76:e2:6e:ec:f6:e1:8a:d8:8e:da:da:38:1e:0d:5a:26"]
       - attach_workspace:
           at: ~/
+          
+      - run:
+          name: Install AWS CLI for rollback
+          when: on_fail
+          command: |
+            apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
       - run:
           name: "Install dependencies"
           command: |
             apk add openssh-client
             apk add --update ansible
+
       - run:
           name: "Configure server"
           no_output_timeout: 30m
