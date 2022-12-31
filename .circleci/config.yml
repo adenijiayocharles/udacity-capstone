@@ -171,9 +171,9 @@ jobs:
           name: Build application Docker image
           command: |
             cd backend
-            docker build -t adenijiayocharles/udanodeapp:${CIRCLE_SHA1} .
-            docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
-            docker push adenijiayocharles/udanodeapp:${CIRCLE_SHA1}
+            # docker build -t adenijiayocharles/udanodeapp:${CIRCLE_SHA1} .
+            # docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
+            # docker push adenijiayocharles/udanodeapp:${CIRCLE_SHA1}
   install-minikube-kubectl:
     docker:
       - image: circleci/ruby:2.4.1
