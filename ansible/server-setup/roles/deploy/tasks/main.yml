@@ -8,12 +8,3 @@
   unarchive:
     src: /home/circleci/project/artifact.tar.gz
     dest: /home/ubuntu/backend
-
-- name: "Start server"
-  become: true
-  shell: |
-    cd /home/ubuntu/backend
-    npm install
-    npm run build
-    pm2 stop default
-    pm2 start npm -- start
