@@ -81,7 +81,7 @@ jobs:
           fingerprints: ["76:e2:6e:ec:f6:e1:8a:d8:8e:da:da:38:1e:0d:5a:26"]
       - attach_workspace:
           at: ~/
-          
+
       - run:
           name: Install AWS CLI for rollback
           when: on_fail
@@ -154,7 +154,6 @@ jobs:
           name: "Deploy Docker"
           command: |
             cd backend
-            npm i
             cd ..
             tar -C backend -czvf artifact.tar.gz .
             cd ansible
