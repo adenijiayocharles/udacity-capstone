@@ -189,7 +189,7 @@ jobs:
             sudo mv minikube-linux-amd64 /usr/local/bin/minikube
             sleep 5
             minikube delete
-            minikube start --v=1
+            minikube start -v=1
       - run:
           name: Install Kubectl
           command: |
