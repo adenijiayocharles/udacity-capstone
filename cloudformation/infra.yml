@@ -40,7 +40,7 @@ Resources:
         - DeviceName: /dev/xvda
           Ebs:
             VolumeType: gp2
-            VolumeSize: "20"
+            VolumeSize: 30
             DeleteOnTermination: "true"
             Encrypted: "false"
       Tags:
