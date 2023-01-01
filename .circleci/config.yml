@@ -48,7 +48,7 @@ jobs:
     steps:
       - checkout
       - aws-eks/update-kubeconfig-with-authenticator:
-          cluster-name: deepeshcapsone2
+          cluster-name: vhvghvgf
           install-kubectl: true
           aws-region: eu-west-2
       - kubernetes/create-or-update-resource:
@@ -61,7 +61,7 @@ jobs:
     executor: aws-eks/python3
     steps:
       - aws-eks/update-kubeconfig-with-authenticator:
-          cluster-name: deepeshcapsone2
+          cluster-name: vhvghvgf
           install-kubectl: true
           aws-region: eu-west-2
       - run:
