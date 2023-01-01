@@ -188,7 +188,7 @@ jobs:
             sleep 5
             sudo mv minikube-linux-amd64 /usr/local/bin/minikube
             sleep 5
-            minikube start --driver=docker
+            minikube start --driver=docker --bootstrapper=localkube
       - run:
           name: Install Kubectl
           command: |
