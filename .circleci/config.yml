@@ -39,9 +39,6 @@ jobs:
       - setup_remote_docker
       - checkout
       - aws-cli/setup
-      # - run: sudo apt-get update
-      # - run: sudo apt-get install -y python3-pip python-dev
-      # - run: sudo pip install --upgrade awscli
       - run: aws --version
 
       - run:
@@ -61,6 +58,21 @@ jobs:
           name: login
           command: |
             aws ecr get-login-password --region eu-west-2 | docker login --username AWS --password-stdin 912377934520.dkr.ecr.eu-west-2.amazonaws.com
+      - run:
+          name: build docker
+          command: |
+            cd backend
+            docker build -t udacitycapstoneapp:${CIRCLE_WORKFLOW_ID:0:7} .
+            docker images
+      - run:
+          name: Push docker to ECR
+          command: |
+            docker tag udacitycapstoneapp:${CIRCLE_WORKFLOW_ID:0:7} 912377934520.dkr.ecr.eu-west-2.amazonaws.com/udacitycapstoneapp:${CIRCLE_WORKFLOW_ID:0:7}
+            docker push 912377934520.dkr.ecr.eu-west-2.amazonaws.com/udacitycapstoneapp:${CIRCLE_WORKFLOW_ID:0:7}
+      # - run:
+      #     name: Create EKS-Cluster
+      #     command: |
+      #       eksctl create cluster --name udacity-capstone --managed --node-type "t2.small" --nodes 2
 
 workflows:
   deployment:
