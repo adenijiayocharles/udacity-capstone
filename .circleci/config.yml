@@ -136,7 +136,7 @@ jobs:
     steps:
       - checkout
       - aws-eks/update-kubeconfig-with-authenticator:
-          cluster-name: vhvghvgf
+          cluster-name: udanodeapp
           install-kubectl: true
           aws-region: eu-west-2
       - kubernetes/create-or-update-resource:
@@ -149,7 +149,7 @@ jobs:
     executor: aws-eks/python3
     steps:
       - aws-eks/update-kubeconfig-with-authenticator:
-          cluster-name: vhvghvgf
+          cluster-name: udanodeapp
           install-kubectl: true
           aws-region: eu-west-2
       - run:
