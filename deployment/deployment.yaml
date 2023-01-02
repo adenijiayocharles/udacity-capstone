@@ -16,15 +16,15 @@ spec:
     spec:
       containers:
         - name: app
-          image: adenijiayocharles/udacitynodejs:1.0
+          image: DOCKER_IMAGE_NAME
           resources:
             requests:
               cpu: 100m
               memory: 100Mi
-          # env:
-          #   - name: VERSION_INFO
-          #     value: "VERSION_INFO_VALUE"
-          #   - name: BUILD_DATE
-          #     value: "BUILD_DATE_VALUE"
+          env:
+            - name: VERSION_INFO
+              value: "VERSION_INFO_VALUE"
+            - name: BUILD_DATE
+              value: "BUILD_DATE_VALUE"
           ports:
             - containerPort: 8080
