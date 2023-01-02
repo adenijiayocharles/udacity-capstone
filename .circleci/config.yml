@@ -39,9 +39,9 @@ jobs:
           name: Build application Docker image
           command: |
             cd backend
-            docker build -t adenijiayocharles/udacitycapstoneapp:1.0 .
+            docker build -t adenijiayocharles/udacitynodejs:1.0 .
             docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
-            docker push adenijiayocharles/udacitycapstoneapp:1.0
+            docker push adenijiayocharles/udacitynodejs:1.0
   deploy:
     docker:
       - image: circleci/python:3.7
@@ -67,7 +67,7 @@ jobs:
       - run:
           name: Connect to cluster
           command: |
-            aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name udacitycapstoneapp
+            aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name udacitynodejs
       - run:
           name: Deploy
           command: |
