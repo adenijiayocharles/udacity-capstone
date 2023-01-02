@@ -148,8 +148,8 @@ workflows:
             - build-backend
       - aws-ecr/build_and_push_image:
           name: build-and-push-image
-          account-url: AWS_ECR_URL
-          region: AWS_DEFAULT_REGION
+          account-url: $AWS_ECR_URL
+          region: $AWS_DEFAULT_REGION
           repo: eks_orb_demo_app_1
           dockerfile: ~/project/backend/Dockerfile
           path: ~/project/backend
@@ -166,7 +166,7 @@ workflows:
       - deploy-application:
           cluster-name: eks-orb-demo-app-deployment
           aws-region: $AWS_DEFAULT_REGION
-          docker-image-name: "${AWS_ECR_URL}/eks_orb_demo_app:${CIRCLE_SHA1}"
+          docker-image-name: "${AWS_ECR_URL}/eks_orb_demo_app_1:${CIRCLE_SHA1}"
           version-info: "${CIRCLE_SHA1}"
           requires:
             - aws-eks/create-cluster
