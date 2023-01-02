@@ -1,42 +1,36 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: demoapp
+  name: app-staging-deployment
   labels:
-    app: demo
+    app: app-staging
 spec:
+  replicas: 2
   selector:
     matchLabels:
-      app: demo
-  replicas: 3
+      app: app-staging
   template:
     metadata:
       labels:
-        app: demo
+        app: app-staging
     spec:
       containers:
-        - name: app
-          image: adenijiayocharles/udanodeapp:${CIRCLE_SHA1}
-          resources:
-            requests:
-              cpu: 100m
-              memory: 100Mi
+        - name: app-staging
+          image: adenijiayocharles/udadnodeapp:${CIRCLE_SHA1}
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
 
 ---
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
-  name: demoapp
-  labels:
-    app: demo
+  name: app-staging-service
 spec:
-  # automatically create an external load-balanced IP for the service.
   type: LoadBalancer
-  ports:
-    - port: 80
-      targetPort: 8080
-      protocol: TCP
   selector:
-    app: demo
+    app: app-staging
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
