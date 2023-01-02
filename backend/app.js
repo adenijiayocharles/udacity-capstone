@@ -4,12 +4,12 @@ const helmet = require('helmet');
 
 const app = express();
 
-const PORT = 3030;
+const PORT = 8080;
 
 app.use(helmet());
 
 app.get('/health_check', (req, res) => {
-  res.json({ status: 'application running' });
+  res.json({ status: 'This is my capstone project. Application running' });
 });
 
 app.listen(PORT, async () => {

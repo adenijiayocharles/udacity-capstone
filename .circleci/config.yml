@@ -72,14 +72,14 @@ jobs:
       - run:
           name: Create EKS-Cluster
           command: |
-            eksctl create cluster --name udacitycapstoneappnew --managed --node-type "t2.small" --nodes 2
+            eksctl create cluster --name udacitycapstonenodeapp --managed --node-type "t2.small" --nodes 1
   deployment:
     executor: aws-eks/python3
     steps:
       - checkout
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
-          cluster-name: udacitycapstoneappnew
+          cluster-name: udacitycapstonenodeapp
           install-kubectl: true
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
@@ -91,13 +91,28 @@ jobs:
     steps:
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
-          cluster-name: udacitycapstoneappnew
+          cluster-name: udacitycapstonenodeapp
       - run:
           name: Test cluster
           command: |
             kubectl get svc
             kubectl get nodes
             kubectl get deployment
+
+            kubectl get pods
+            kubectl get services
+            sleep 30
+            for attempt in {1..20}; do
+              EXTERNAL_IP=$(kubectl get service udacity-capstone-app | awk '{print $4}' | tail -n1)
+              echo "Checking external IP: ${EXTERNAL_IP}"
+              if [ -n "${EXTERNAL_IP}" ] && [ -z $(echo "${EXTERNAL_IP}" | grep "pending") ]; then
+                break
+              fi
+              echo "Waiting for external IP to be ready: ${EXTERNAL_IP}"
+              sleep 10
+            done
+            sleep 180
+            curl -s --retry 10 "http://$EXTERNAL_IP:8080/health_check" | grep "Application running"
 
 workflows:
   deployment:
