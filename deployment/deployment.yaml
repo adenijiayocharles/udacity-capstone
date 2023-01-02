@@ -1,36 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: app-staging-deployment
+  name: demoapp
   labels:
-    app: app-staging
+    app: demo
 spec:
-  replicas: 2
   selector:
     matchLabels:
-      app: app-staging
+      app: demo
+  replicas: 3
   template:
     metadata:
       labels:
-        app: app-staging
+        app: demo
     spec:
       containers:
-        - name: app-staging
+        - name: app
           image: adenijiayocharles/udadnodeapp:${CIRCLE_SHA1}
-          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 100m
+              memory: 100Mi
           ports:
             - containerPort: 8080
-
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: app-staging-service
-spec:
-  type: LoadBalancer
-  selector:
-    app: app-staging
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
