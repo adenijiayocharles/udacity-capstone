@@ -67,19 +67,19 @@ jobs:
       - run:
           name: Push docker to ECR
           command: |
-            docker tag udacitycapstoneapp:${CIRCLE_WORKFLOW_ID:0:7} 912377934520.dkr.ecr.eu-west-2.amazonaws.com/udacitycapstoneapp:${CIRCLE_WORKFLOW_ID:0:7}
-            docker push 912377934520.dkr.ecr.eu-west-2.amazonaws.com/udacitycapstoneapp:${CIRCLE_WORKFLOW_ID:0:7}
+            docker tag udacitycapstoneapp:${CIRCLE_WORKFLOW_ID:0:7} 912377934520.dkr.ecr.eu-west-2.amazonaws.com/udacitycapstoneapp:latest
+            docker push 912377934520.dkr.ecr.eu-west-2.amazonaws.com/udacitycapstoneapp:latest
       - run:
           name: Create EKS-Cluster
           command: |
-            eksctl create cluster --name udacitycapstoneapp --managed --node-type "t2.small" --nodes 2
+            eksctl create cluster --name udacitycapstoneapp_new --managed --node-type "t2.small" --nodes 2
   deployment:
     executor: aws-eks/python3
     steps:
       - checkout
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
-          cluster-name: udacitycapstoneapp
+          cluster-name: udacitycapstoneapp_new
           install-kubectl: true
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
@@ -91,7 +91,7 @@ jobs:
     steps:
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
-          cluster-name: udacitycapstoneapp
+          cluster-name: udacitycapstoneapp_new
       - run:
           name: Test cluster
           command: |

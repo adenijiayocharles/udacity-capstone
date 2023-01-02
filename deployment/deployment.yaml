@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: udacity-capstone-app
-          image: 912377934520.dkr.ecr.eu-west-2.amazonaws.com/udacitycapstoneapp:${CIRCLE_WORKFLOW_ID:0:7}
+          image: 912377934520.dkr.ecr.eu-west-2.amazonaws.com/udacitycapstoneapp:latest
           ports:
             - containerPort: 5000
 
