@@ -150,14 +150,14 @@ workflows:
           name: build-and-push-image
           account-url: AWS_ECR_URL
           region: AWS_DEFAULT_REGION
-          repo: eks_orb_demo_app
+          repo: eks_orb_demo_app_1
           dockerfile: ~/project/backend/Dockerfile
           path: ~/project/backend
           tag: ${CIRCLE_SHA1}
           requires:
             - lint-backend
           # Uncomment if the repository does not yet exist
-          # create-repo: true
+          create-repo: true
       - aws-eks/create-cluster:
           cluster-name: eks-orb-demo-app-deployment
           aws-region: $AWS_DEFAULT_REGION
