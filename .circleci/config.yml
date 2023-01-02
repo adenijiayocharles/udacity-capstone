@@ -72,6 +72,7 @@ jobs:
           name: Deploy
           command: |
             kubectl apply -f deployment/deployment.yaml
+            sleep 10
             kubectl get pods
 
 workflows:
