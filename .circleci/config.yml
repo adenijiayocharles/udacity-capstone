@@ -148,8 +148,8 @@ workflows:
             - build-backend
       - aws-ecr/build_and_push_image:
           name: build-and-push-image
-          account-url: $AWS_ECR_URL
-          region: $AWS_DEFAULT_REGION
+          account-url: AWS_ECR_URL
+          region: AWS_DEFAULT_REGION
           repo: eks_orb_demo_app_1
           dockerfile: ~/project/backend/Dockerfile
           path: ~/project/backend
