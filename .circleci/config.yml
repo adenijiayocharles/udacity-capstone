@@ -88,11 +88,6 @@ jobs:
 
   test-cluster:
     executor: aws-eks/python3
-    parameters:
-      cluster-name:
-        description: |
-          udacity-capstone
-        type: string
     steps:
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
