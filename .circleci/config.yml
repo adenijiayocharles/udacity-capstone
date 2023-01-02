@@ -72,14 +72,14 @@ jobs:
       - run:
           name: Create EKS-Cluster
           command: |
-            eksctl create cluster --name udacitycapstoneapp_new --managed --node-type "t2.small" --nodes 2
+            eksctl create cluster --name udacitycapstoneappnew --managed --node-type "t2.small" --nodes 2
   deployment:
     executor: aws-eks/python3
     steps:
       - checkout
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
-          cluster-name: udacitycapstoneapp_new
+          cluster-name: udacitycapstoneappnew
           install-kubectl: true
       - kubernetes/create-or-update-resource:
           get-rollout-status: true
@@ -91,7 +91,7 @@ jobs:
     steps:
       - kubernetes/install
       - aws-eks/update-kubeconfig-with-authenticator:
-          cluster-name: udacitycapstoneapp_new
+          cluster-name: udacitycapstoneappnew
       - run:
           name: Test cluster
           command: |
