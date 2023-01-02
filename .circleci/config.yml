@@ -71,10 +71,10 @@ jobs:
       - run:
           name: Deploy
           command: |
-            cat deployment/deployment.yaml
-            kubectl config view
-            kubectl apply -f deployment/deployment.yaml --validate=true
-            # kubectl get pods
+            # cat deployment/deployment.yaml
+            # kubectl config view
+            # kubectl apply -f deployment/deployment.yaml --validate=true
+            kubectl get pods
 
 workflows:
   default:
