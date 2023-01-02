@@ -69,10 +69,10 @@ jobs:
           command: |
             docker tag udacitycapstoneapp:${CIRCLE_WORKFLOW_ID:0:7} 912377934520.dkr.ecr.eu-west-2.amazonaws.com/udacitycapstoneapp:${CIRCLE_WORKFLOW_ID:0:7}
             docker push 912377934520.dkr.ecr.eu-west-2.amazonaws.com/udacitycapstoneapp:${CIRCLE_WORKFLOW_ID:0:7}
-      # - run:
-      #     name: Create EKS-Cluster
-      #     command: |
-      #       eksctl create cluster --name udacity-capstone --managed --node-type "t2.small" --nodes 2
+      - run:
+          name: Create EKS-Cluster
+          command: |
+            eksctl create cluster --name udacitycapstoneapp --managed --node-type "t2.small" --nodes 2
 
 workflows:
   deployment:
