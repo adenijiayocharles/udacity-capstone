@@ -6,6 +6,45 @@ orbs:
   kubernetes: circleci/kubernetes@0.3.0
 
 jobs:
+  build-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - run:
+          name: "Build the backend"
+          command: |
+            cd backend
+            npm install
+      - save_cache:
+          paths: [backend/node_modules]
+          key: "backend-build"
+  lint-backend:
+    docker:
+      - image: circleci/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: ["backend-build"]
+      - run:
+          name: "Lint the backend"
+          command: |
+            cd backend
+            npm install
+            npm run lint
+  build-and-push-image:
+    docker:
+      - image: docker:17.05.0-ce-git
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: Build application Docker image
+          command: |
+            cd backend
+            docker build -t adenijiayocharles/udacitynodejs:1.0 .
+            docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
+            docker push adenijiayocharles/udacitynodejs:1.0
   deploy-application:
     executor: aws-eks/python3
     parameters:
@@ -28,17 +67,17 @@ jobs:
         default: ""
     steps:
       - checkout
-      - run:
-          name: Create deployment manifest
-          command: |
-            # Replace the placeholders in the manifest with the intended values.
-            # This is to avoid hardcoding the image name in the manifest, to make this
-            # demo project more portable.
-            BUILD_DATE=$(date '+%Y%m%d%H%M%S')
-            cat deployment/demo-app-deployment.yaml.template |\
-               sed "s|DOCKER_IMAGE_NAME|<< parameters.docker-image-name >>|\
-                g;s|BUILD_DATE_VALUE|$BUILD_DATE|g;s|VERSION_INFO_VALUE|\
-                << parameters.version-info >>|g" > deployment/demo-app-deployment.yaml
+      # - run:
+      #     name: Create deployment manifest
+      #     command: |
+      #       # Replace the placeholders in the manifest with the intended values.
+      #       # This is to avoid hardcoding the image name in the manifest, to make this
+      #       # demo project more portable.
+      #       BUILD_DATE=$(date '+%Y%m%d%H%M%S')
+      #       cat deployment/deployment.yaml |\
+      #          sed "s|DOCKER_IMAGE_NAME|<< parameters.docker-image-name >>|\
+      #           g;s|BUILD_DATE_VALUE|$BUILD_DATE|g;s|VERSION_INFO_VALUE|\
+      #           << parameters.version-info >>|g" > deployment/deployment.yaml
       - aws-eks/update-kubeconfig-with-authenticator:
           cluster-name: << parameters.cluster-name >>
           install-kubectl: true
@@ -116,16 +155,19 @@ jobs:
 workflows:
   deployment:
     jobs:
-      - aws-ecr/build_and_push_image:
-          name: build-and-push-image
-          account-url: AWS_ECR_URL
-          region: AWS_DEFAULT_REGION
-          repo: eks_orb_demo_app
-          dockerfile: ~/project/backend/Dockerfile
-          path: ~/project/backend
-          tag: ${CIRCLE_SHA1}
-          # Uncomment if the repository does not yet exist
-          # create-repo: true
+      # - aws-ecr/build_and_push_image:
+      #     name: build-and-push-image
+      #     account-url: AWS_ECR_URL
+      #     region: AWS_DEFAULT_REGION
+      #     repo: eks_orb_demo_app
+      #     dockerfile: ~/project/backend/Dockerfile
+      #     path: ~/project/backend
+      #     tag: ${CIRCLE_SHA1}
+      # Uncomment if the repository does not yet exist
+      # create-repo: true
+      - build-backend
+      - lint-backend:
+          requires: [build-backend]
       - aws-eks/create-cluster:
           cluster-name: eks-orb-demo-app-deployment
           aws-region: $AWS_DEFAULT_REGION
