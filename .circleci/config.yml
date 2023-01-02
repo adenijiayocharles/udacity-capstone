@@ -71,10 +71,7 @@ jobs:
       - run:
           name: Deploy
           command: |
-            # cat deployment/deployment.yaml
-            kubectl config view
-            kubectl apply -f deployment/deployment.yaml --validate=true
-            sleep 5
+            kubectl apply -f deployment/deployment.yaml
             kubectl get pods
 
 workflows:
