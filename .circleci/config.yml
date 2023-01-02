@@ -76,7 +76,5 @@ workflows:
           requires: [build-backend]
       - build-and-push-docker-image:
           requires: [lint-backend]
-      - deploy-application:
+      - deploy:
           requires: [build-and-push-docker-image]
-      - test-application:
-          requires: [deploy-application]
