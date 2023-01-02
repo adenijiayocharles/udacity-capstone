@@ -68,6 +68,11 @@ jobs:
           name: Connect to cluster
           command: |
             aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name vhvghvgf
+      - run:
+          name: Deploy
+          command: |
+            kubectl apply -f deployment/deployment.yaml
+            kubectl get pod
 workflows:
   default:
     jobs:
