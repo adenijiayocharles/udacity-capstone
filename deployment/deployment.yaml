@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: udacitycapstoneapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: udacitycapstoneapp
+  template:
+    metadata:
+      labels:
+        app: udacitycapstoneapp
+    spec:
+      containers:
+        - name: udacitycapstoneapp
+          image: adenijiayocharles/udacitycapstoneapp:1.0
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 50%
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: udacitycapstoneapp
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: udacitycapstoneapp

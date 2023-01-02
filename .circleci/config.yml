@@ -1,4 +1,7 @@
 version: 2.1
+orbs:
+  aws-eks: circleci/aws-eks@2.2.0
+  kubernetes: circleci/kubernetes@1.3
 jobs:
   build-backend:
     docker:
@@ -26,128 +29,6 @@ jobs:
             cd backend
             npm install
             npm run lint
-  deploy-infrastructure:
-    docker:
-      - image: amazon/aws-cli
-    steps:
-      - checkout
-      - run:
-          name: Install tar utility
-          command: |
-            yum install -y tar gzip
-      - run:
-          name: "Ensure that backend infrasturcture exists"
-          command: |
-            aws cloudformation deploy \
-            --template-file cloudformation/infra.yml \
-            --stack-name "udanode-backend-${CIRCLE_WORKFLOW_ID}" \
-            --parameter-overrides ID="${CIRCLE_WORKFLOW_ID}" \
-            --tags project=udanode-backend \
-      - run:
-          name: "Add EC2 Instance IP to the ansible inventory"
-          command: |
-            aws ec2 describe-instances \
-            --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            --filter "Name=tag-value,Values=backend-${CIRCLE_WORKFLOW_ID}" \
-            --output text >> ansible/inventory.txt
-            cat ansible/inventory.txt
-      - restore_cache:
-          keys: [backend-build]
-      - persist_to_workspace:
-          root: ~/
-          paths:
-            - project/ansible/inventory.txt
-      - destroy-environment:
-          workflow_id: "${CIRCLE_WORKFLOW_ID}"
-  configure-infrastructure:
-    docker:
-      - image: python:3.7-alpine3.11
-    steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints: ["76:e2:6e:ec:f6:e1:8a:d8:8e:da:da:38:1e:0d:5a:26"]
-      - attach_workspace:
-          at: ~/
-      - run:
-          name: Install AWS CLI for rollback
-          when: on_fail
-          command: |
-            apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
-      - run:
-          name: "Install dependencies"
-          command: |
-            apk add openssh-client
-            apk add --update ansible
-      - run:
-          name: Install AWS CLI for rollback
-          when: on_fail
-          command: |
-            apk add --update py3-pip && pip3 install --upgrade pip && pip3 install awscli
-      - run:
-          name: "Configure server"
-          no_output_timeout: 30m
-          command: |
-            cd backend
-            cd ..
-            tar -C backend -czvf artifact.tar.gz .
-            cd ansible
-            cat inventory.txt
-            export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook -i inventory.txt server-setup/configure-server.yml
-      - destroy-environment:
-          workflow_id: "${CIRCLE_WORKFLOW_ID}"
-  deploy-backend:
-    docker:
-      - image: circleci/node:13.8.0
-    steps:
-      - checkout
-      - add_ssh_keys:
-          fingerprints: ["23:c6:14:3e:f0:0e:0f:17:4b:da:05:f5:dd:93:1f:60"]
-      - attach_workspace:
-          at: ~/
-      - restore_cache:
-          keys: [backend-build]
-      - run:
-          name: Install tar utility
-          command: |
-            sudo apt -y update
-            sudo apt -y upgrade
-            sudo apt -y install software-properties-common
-            sudo apt-get -y install tar
-      - run:
-          name: Install gzip unzip utility
-          command: |
-            sudo apt-get -y install gzip
-            sudo apt-get -y install unzip
-      - run:
-          name: Install python
-          command: |
-            sudo apt-get -y install python3
-      - run:
-          name: "Install ansible"
-          command: |
-            sudo add-apt-repository --y ppa:ansible/ansible
-            sudo apt-get -y install ansible
-      - run:
-          name: Install awscli
-          command: |
-            echo "insecure" >> ~/.curlrc
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
-      - run:
-          name: "Deploy backend"
-          command: |
-            cd backend
-            cd ..
-            tar -C backend -czvf artifact.tar.gz .
-            cd ansible
-            echo "Contents of the inventory.txt file is -------"
-            cat inventory.txt
-            export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook -i inventory.txt server-setup/deploy-backend.yml
-      - destroy-environment:
-          workflow_id: "${CIRCLE_WORKFLOW_ID}"
   build-and-push-docker-image:
     docker:
       - image: docker:17.05.0-ce-git
@@ -158,30 +39,43 @@ jobs:
           name: Build application Docker image
           command: |
             cd backend
-            docker build -t adenijiayocharles/udanodeapp:${CIRCLE_SHA1} .
+            docker build -t adenijiayocharles/udacitycapstoneapp:1.0 .
             docker login -u $DOCKER_LOGIN -p $DOCKER_PASSWORD
-            docker push adenijiayocharles/udanodeapp:${CIRCLE_SHA1}
-  install-kubectl:
+            docker push adenijiayocharles/udacitycapstoneapp:1.0
+  deploy:
     docker:
       - image: circleci/python:3.7
     steps:
       - checkout
-      - setup_remote_docker
       - run:
-          name: Install Kubectl
+          name: Install awscli and gettext-base
           command: |
-            curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+            sudo pip3 install awscli
+            sudo apt-get install gettext-base
+      - run:
+          name: Install aws-iam-authenticator
+          command: |
+            curl -o aws-iam-authenticator curl -o aws-iam-authenticator https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/aws-iam-authenticator
+            chmod +x ./aws-iam-authenticator
+            sudo mv ./aws-iam-authenticator /usr/local/bin/aws-iam-authenticator
+      - run:
+          name: Install kubectl
+          command: |
+            curl -o kubectl https://amazon-eks.s3-us-west-2.amazonaws.com/1.13.7/2019-06-11/bin/linux/amd64/kubectl
             chmod +x ./kubectl
             sudo mv ./kubectl /usr/local/bin/kubectl
       - run:
-          name: Install Minikube
+          name: Connect to cluster
           command: |
-            wget https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-            chmod +x minikube-linux-amd64
+            aws eks --region $AWS_DEFAULT_REGION update-kubeconfig --name udacitycapstoneapp
+      - run:
+          name: Deploy
+          command: |
+            # cat deployment/deployment.yaml
+            kubectl config view
+            kubectl apply -f deployment/deployment.yaml --validate=true
             sleep 5
-            sudo mv minikube-linux-amd64 /usr/local/bin/minikube
-            sleep 5
-            minikube start
+            kubectl get pods
 
 workflows:
   default:
@@ -189,13 +83,7 @@ workflows:
       - build-backend
       - lint-backend:
           requires: [build-backend]
-      - deploy-infrastructure:
-          requires: [lint-backend]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - deploy-backend:
-          requires: [configure-infrastructure]
       - build-and-push-docker-image:
-          requires: [deploy-backend]
-      - install-kubectl:
+          requires: [lint-backend]
+      - deploy:
           requires: [build-and-push-docker-image]
