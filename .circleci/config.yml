@@ -54,7 +54,7 @@ jobs:
       - run:
           name: Login to AWS ECR
           command: |
-            aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin 912377934520.dkr.ecr.us-east-1.amazonaws.com/udacitycapstoneappnew
+            aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin 912377934520.dkr.ecr.eu-west-1.amazonaws.com/udacitycapstoneappnew
       - run:
           name: Build Docker Image
           command: |
@@ -64,8 +64,8 @@ jobs:
       - run:
           name: Push Docker Image to AWS ECR
           command: |
-            docker tag udacitycapstoneappnew:${CIRCLE_WORKFLOW_ID:0:7} 912377934520.dkr.ecr.us-east-1.amazonaws.com/udacitycapstoneappnew:latest
-            docker push 912377934520.dkr.ecr.us-east-1.amazonaws.com/udacitycapstoneappnew:latest
+            docker tag udacitycapstoneappnew:${CIRCLE_WORKFLOW_ID:0:7} 912377934520.dkr.ecr.eu-west-1.amazonaws.com/udacitycapstoneappnew:latest
+            docker push 912377934520.dkr.ecr.eu-west-1.amazonaws.com/udacitycapstoneappnew:latest
       - run:
           name: Create EKS Cluster
           command: |

@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: udacity-capstone-app
-          image: 912377934520.dkr.ecr.us-east-1.amazonaws.com/udacitycapstoneappnew:latest
+          image: 912377934520.dkr.ecr.eu-west-1.amazonaws.com/udacitycapstoneappnew:latest
           ports:
             - containerPort: 8080
 
