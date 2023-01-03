@@ -1,6 +1,6 @@
 #### Udacity Capstone Project
 
--
+-   Rolling Deployment
 
 ## CircleCI Pipeline status:
 
