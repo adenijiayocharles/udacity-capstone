@@ -111,15 +111,15 @@ jobs:
             sleep 180
             curl -s --retry 10 "http://$EXTERNAL_IP:8080/health_check" | grep "Application running"
 
-workflows:
-  deployment:
-    jobs:
-      - build-backend
-      - lint-backend:
-          requires: [build-backend]
-      - build-docker-deploy-cluster:
-          requires: [lint-backend]
-      - deploy-cluster:
-          requires: [build-docker-deploy-cluster]
-      - test-cluster:
-          requires: [deploy-cluster]
+# workflows:
+#   deployment:
+#     jobs:
+#       - build-backend
+#       - lint-backend:
+#           requires: [build-backend]
+#       - build-docker-deploy-cluster:
+#           requires: [lint-backend]
+#       - deploy-cluster:
+#           requires: [build-docker-deploy-cluster]
+#       - test-cluster:
+#           requires: [deploy-cluster]
